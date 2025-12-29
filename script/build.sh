@@ -10,7 +10,8 @@ PLUGIN_VERSION=''
 supported_godot_versions=("4.2" "4.3" "4.4" "4.5.1")
 BUILD_TIMEOUT=40	# increase this value using -t option if device is not able to generate all headers before godot build is killed
 
-DEST_DIRECTORY="./bin/release"
+DEST_RELEASE_DIRECTORY="./bin/release"
+DEST_DEBUG_DIRECTORY="./bin/debug"
 FRAMEWORKDIR="./bin/framework"
 LIB_DIRECTORY="./bin/lib"
 CONFIG_DIRECTORY="./config"
@@ -220,24 +221,53 @@ function build_plugin()
 	GODOT_VERSION=$(cat ./godot/GODOT_VERSION)
 
 	# Clear target directories
-	rm -rf "$DEST_DIRECTORY"
+	rm -rf "$DEST_RELEASE_DIRECTORY"
+	rm -rf "$DEST_DEBUG_DIRECTORY"
 	rm -rf "$LIB_DIRECTORY"
 
 	# Create target directories
-	mkdir -p "$DEST_DIRECTORY"
+	mkdir -p "$DEST_RELEASE_DIRECTORY"
+	mkdir -p "$DEST_DEBUG_DIRECTORY"
 	mkdir -p "$LIB_DIRECTORY"
 
-	display_status "building plugin library with godot version $GODOT_VERSION ..."
+	display_status "building plugin libraries with godot version $GODOT_VERSION ..."
 
-	# Compile library
+	# Build static libraries
 	generate_static_library release $LIB_DIRECTORY
 	generate_static_library release_debug $LIB_DIRECTORY
 	mv $LIB_DIRECTORY/$plugin_name.release_debug.a $LIB_DIRECTORY/$plugin_name.debug.a
 
-	# Move library
-	cp $LIB_DIRECTORY/$plugin_name.{release,debug}.a "$DEST_DIRECTORY"
+	# ---- RELEASE ----
+	cp $LIB_DIRECTORY/$plugin_name.release.a \
+		"$DEST_RELEASE_DIRECTORY/$plugin_name.release.a"
 
-	cp "$CONFIG_DIRECTORY"/*.gdip "$DEST_DIRECTORY"
+	generate_gdip \
+		"$DEST_RELEASE_DIRECTORY/${plugin_name}_release.gdip" \
+		"GodotPlugin_Release" \
+		"$plugin_name.release.a"
+
+	# ---- DEBUG ----
+	cp $LIB_DIRECTORY/$plugin_name.debug.a \
+		"$DEST_DEBUG_DIRECTORY/$plugin_name.debug.a"
+
+	generate_gdip \
+		"$DEST_DEBUG_DIRECTORY/${plugin_name}_debug.gdip" \
+		"GodotPlugin_Debug" \
+		"$plugin_name.debug.a"
+
+}
+
+function generate_gdip()
+{
+	local output_file="$1"
+	local plugin_display_name="$2"
+	local binary_name="$3"
+
+	sed \
+		-e "s/__PLUGIN_NAME__/$plugin_display_name/g" \
+		-e "s/__PLUGIN_BINARY__/$binary_name/g" \
+		"$CONFIG_DIRECTORY/$plugin_name.gdip" \
+		> "$output_file"
 }
 
 
@@ -285,10 +315,12 @@ function create_zip_archive()
 	find ./Pods -iname '*.xcframework' -type d -exec cp -r {} $tmp_directory/ios/framework \;
 
 	mkdir -p $tmp_directory/ios/plugins
-	cp $CONFIG_DIRECTORY/*.gdip $tmp_directory/ios/plugins
-	cp $LIB_DIRECTORY/$plugin_name.{release,debug}.a $tmp_directory/ios/plugins
+	
+	shopt -s nullglob
+	cp ./bin/release/*.gdip ./bin/release/*.a $tmp_directory/ios/plugins 2>/dev/null || true
+	cp ./bin/debug/*.gdip   ./bin/debug/*.a   $tmp_directory/ios/plugins 2>/dev/null || true
+	shopt -u nullglob
 
-	mkdir -p $DEST_DIRECTORY
 
 	display_status "creating $file_name file..."
 	cd $tmp_directory; zip -yr ../release/$file_name ./*; cd -

@@ -1,6 +1,6 @@
 [config]
-name="GodotPlugin"
-binary="godot_plugin.release.a"
+name="__PLUGIN_NAME__"
+binary="__PLUGIN_BINARY__"
 
 initialization="godot_plugin_init"
 deinitialization="godot_plugin_deinit"
