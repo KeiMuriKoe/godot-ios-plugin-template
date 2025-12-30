@@ -243,7 +243,7 @@ function build_plugin()
 
 	generate_gdip \
 		"$DEST_RELEASE_DIRECTORY/${plugin_name}_release.gdip" \
-		"GodotPlugin_Release" \
+		"${plugin_name}_release" \
 		"$plugin_name.release.a"
 
 	# ---- DEBUG ----
@@ -252,7 +252,7 @@ function build_plugin()
 
 	generate_gdip \
 		"$DEST_DEBUG_DIRECTORY/${plugin_name}_debug.gdip" \
-		"GodotPlugin_Debug" \
+		"${plugin_name}_debug" \
 		"$plugin_name.debug.a"
 
 }

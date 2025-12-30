@@ -81,8 +81,6 @@ sed -i '' -e "s/$template_plugin_name_snake_case/$NEW_PLUGIN_NAME/g" SConstruct
 sed -i '' -e "s/$template_plugin_name_snake_case/$NEW_PLUGIN_NAME/g" Podfile
 
 # Change name of library archive mentioned in the plugin's `.gdip` file to the plugin's new name.
-sed -i '' -e "s/name=\"$template_plugin_name\"/name=\"$NEW_PLUGIN_NAME\"/g" config/$template_plugin_name_snake_case.gdip
-sed -i '' -e "s/$template_plugin_name_snake_case.release.a/$NEW_PLUGIN_NAME.release.a/g" config/$template_plugin_name_snake_case.gdip
 sed -i '' -e "s/$template_plugin_name_snake_case/$plugin_name_snake_case/g" config/$template_plugin_name_snake_case.gdip
 
 # Change to the plugin's new name in source files.
