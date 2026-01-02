@@ -4,7 +4,7 @@ use_frameworks!
 plugin_name = 'godot_plugin'
 
 project "#{plugin_name}.xcodeproj"
-workspace "./#{plugin_name}.xcodeproj/project.xcworkspace"
+workspace "#{plugin_name}"
 
 target "#{plugin_name}" do
 	platform :ios, '13.0'
