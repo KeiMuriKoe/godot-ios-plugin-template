@@ -36,3 +36,4 @@ bin/*
 godot/
 Pods/
 Podfile.lock
+godot_headers/
