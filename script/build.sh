@@ -2,6 +2,11 @@
 #
 # © 2024-present https://github.com/cengiz-pz
 #
+
+echo "ERROR: This script is disabled in this fork."
+
+return 1 2>/dev/null || exit 1
+
 set -e
 trap "sleep 1; echo" EXIT
 
