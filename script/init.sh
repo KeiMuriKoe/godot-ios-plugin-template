@@ -66,54 +66,54 @@ NEW_PLUGIN_NAME="${NEW_PLUGIN_NAME//\-/_}"	# replace dashes with underscore
 plugin_name_pascal_case=`echo $NEW_PLUGIN_NAME | perl -pe 's/(^|[_])./uc($&)/ge;s/[_]//g'`
 plugin_name_snake_case=`echo $NEW_PLUGIN_NAME | perl -pe 's/([a-z0-9])([A-Z])/$1_\L$2/g' | perl -nE 'say lcfirst'`
 
-display_status "Using \n*\t- '$NEW_PLUGIN_NAME' as plugin name, \n*\t- '$plugin_name_snake_case' for source files, \n*\t- '$plugin_name_pascal_case' for classes."
+display_status "Using \n*\t- '$NEW_PLUGIN_NAME' (Input) \n*\t- '$plugin_name_snake_case' (Snake) \n*\t- '$plugin_name_pascal_case' (Pascal)"
+sed -i '' -e "s/$template_plugin_name/$plugin_name_pascal_case/g" script/build_plugin.sh
+sed -i '' -e "s/$template_plugin_name_snake_case/$plugin_name_snake_case/g" script/build_plugin.sh
 
-# Change value of `plugin_name` variable in the `script/build.sh` file to the plugin's new name.
+
 sed -i '' -e "s/$template_plugin_name_snake_case/$NEW_PLUGIN_NAME/g" script/build.sh
-
-# Change plugin name in build_plugin.sh
-sed -i '' -e "s/$template_plugin_name/$plugin_name_snake_case/g" script/build_plugin.sh
-
-# Change value of `plugin_name` variable in the `script/install.sh` file to the plugin's new name.
 sed -i '' -e "s/$template_plugin_name/$plugin_name_pascal_case/g" script/install.sh
-
-# Change value of `plugin_name` variable in the `SConstruct` file to the plugin's new name.
 sed -i '' -e "s/$template_plugin_name_snake_case/$NEW_PLUGIN_NAME/g" SConstruct
-
-# Change value of `plugin_name` variable in the `Podfile` file to the plugin's new name.
 sed -i '' -e "s/$template_plugin_name_snake_case/$NEW_PLUGIN_NAME/g" Podfile
 
-# Change name of library archive mentioned in the plugin's `.gdip` file to the plugin's new name.
-sed -i '' -e "s/$template_plugin_name_snake_case/$plugin_name_snake_case/g" config/$template_plugin_name_snake_case.gdip
+GDIP_FILE="config/$template_plugin_name_snake_case.gdip"
 
-# Change to the plugin's new name in source files.
+
+sed -i '' -e "s/$template_plugin_name_snake_case/$plugin_name_snake_case/g" "$GDIP_FILE"
+
+sed -i '' -e "s/__PLUGIN_NAME__/$plugin_name_pascal_case/g" "$GDIP_FILE"
+
+# __PLUGIN_BINARY__ -> snake/snake.xcframework
+sed -i '' -e "s|__PLUGIN_BINARY__|$plugin_name_snake_case/$plugin_name_snake_case.xcframework|g" "$GDIP_FILE"
+
 sed -i '' -e "s/$template_plugin_name_snake_case/$plugin_name_snake_case/g" $template_plugin_name_snake_case/*.h
 sed -i '' -e "s/$template_plugin_name_snake_case/$plugin_name_snake_case/g" $template_plugin_name_snake_case/*.mm
 sed -i '' -e "s/$template_plugin_name/$plugin_name_pascal_case/g" $template_plugin_name_snake_case/*.h
 sed -i '' -e "s/$template_plugin_name/$plugin_name_pascal_case/g" $template_plugin_name_snake_case/*.mm
 
-# Change location value in the plugin's `contents.xcworkspacedata` file to the plugin's new name.
-sed -i '' -e "s/$template_plugin_name_snake_case.xcodeproj/$NEW_PLUGIN_NAME.xcodeproj/g" $template_plugin_name_snake_case.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+sed -i '' -e "s/$template_plugin_name_snake_case.xcodeproj/$NEW_PLUGIN_NAME.xcodeproj/g" \
+	$template_plugin_name_snake_case.xcodeproj/project.xcworkspace/contents.xcworkspacedata
 
-# Change to the plugin's new name in project.pbxproj file.
-sed -i '' -e "s/$template_plugin_name_snake_case.h/$plugin_name_snake_case.h/g" $template_plugin_name_snake_case.xcodeproj/project.pbxproj
-sed -i '' -e "s/$template_plugin_name_snake_case.mm/$plugin_name_snake_case.mm/g" $template_plugin_name_snake_case.xcodeproj/project.pbxproj
-sed -i '' -e "s/${template_plugin_name_snake_case}_implementation.h/${plugin_name_snake_case}_implementation.h/g" $template_plugin_name_snake_case.xcodeproj/project.pbxproj
-sed -i '' -e "s/${template_plugin_name_snake_case}_implementation.mm/${plugin_name_snake_case}_implementation.mm/g" $template_plugin_name_snake_case.xcodeproj/project.pbxproj
-sed -i '' -e "s/$template_plugin_name_snake_case.a/$plugin_name_snake_case.a/g" $template_plugin_name_snake_case.xcodeproj/project.pbxproj
-sed -i '' -e "s/$template_plugin_name_snake_case/$NEW_PLUGIN_NAME/g" $template_plugin_name_snake_case.xcodeproj/project.pbxproj
+sed -i '' -e "s/$template_plugin_name_snake_case.h/$plugin_name_snake_case.h/g" \
+	$template_plugin_name_snake_case.xcodeproj/project.pbxproj
+sed -i '' -e "s/$template_plugin_name_snake_case.mm/$plugin_name_snake_case.mm/g" \
+	$template_plugin_name_snake_case.xcodeproj/project.pbxproj
+sed -i '' -e "s/${template_plugin_name_snake_case}_implementation.h/${plugin_name_snake_case}_implementation.h/g" \
+	$template_plugin_name_snake_case.xcodeproj/project.pbxproj
+sed -i '' -e "s/${template_plugin_name_snake_case}_implementation.mm/${plugin_name_snake_case}_implementation.mm/g" \
+	$template_plugin_name_snake_case.xcodeproj/project.pbxproj
+sed -i '' -e "s/$template_plugin_name_snake_case.a/$plugin_name_snake_case.a/g" \
+	$template_plugin_name_snake_case.xcodeproj/project.pbxproj
+sed -i '' -e "s/$template_plugin_name_snake_case/$NEW_PLUGIN_NAME/g" \
+	$template_plugin_name_snake_case.xcodeproj/project.pbxproj
 
-# Rename plugin source directory to the plugin's new name.
 mv $template_plugin_name_snake_case $NEW_PLUGIN_NAME
-
-# Rename plugin's `.gdip` file to the plugin's new name.
-mv config/$template_plugin_name_snake_case.gdip config/$NEW_PLUGIN_NAME.gdip
-
-# Rename plugin's xcodeproj file to the plugin's new name.
+mv config/$template_plugin_name_snake_case.gdip config/$plugin_name_snake_case.gdip
 mv $template_plugin_name_snake_case.xcodeproj $NEW_PLUGIN_NAME.xcodeproj
 
-# Rename source files.
 mv $NEW_PLUGIN_NAME/$template_plugin_name_snake_case.h $NEW_PLUGIN_NAME/$plugin_name_snake_case.h
 mv $NEW_PLUGIN_NAME/$template_plugin_name_snake_case.mm $NEW_PLUGIN_NAME/$plugin_name_snake_case.mm
-mv $NEW_PLUGIN_NAME/${template_plugin_name_snake_case}_implementation.h $NEW_PLUGIN_NAME/${plugin_name_snake_case}_implementation.h
-mv $NEW_PLUGIN_NAME/${template_plugin_name_snake_case}_implementation.mm $NEW_PLUGIN_NAME/${plugin_name_snake_case}_implementation.mm
+mv $NEW_PLUGIN_NAME/${template_plugin_name_snake_case}_implementation.h \
+   $NEW_PLUGIN_NAME/${plugin_name_snake_case}_implementation.h
+mv $NEW_PLUGIN_NAME/${template_plugin_name_snake_case}_implementation.mm \
+   $NEW_PLUGIN_NAME/${plugin_name_snake_case}_implementation.mm
