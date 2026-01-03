@@ -3,16 +3,15 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-# === CONFIG (ШАБЛОН) ===
 PLUGIN_NAME="GodotPlugin"
 WORKSPACE="${PLUGIN_NAME}.xcworkspace"
 SCHEME="${PLUGIN_NAME}"
 
-BUILD_DIR="$PWD/bin/build"
-XC_OUT="$PWD/bin/xcframework"
+TMP_BUILD="$PWD/.build_tmp"
+OUT_DIR="$PWD/${PLUGIN_NAME}"
 
-rm -rf "$BUILD_DIR" "$XC_OUT"
-mkdir -p "$BUILD_DIR" "$XC_OUT"
+rm -rf "$TMP_BUILD" "$OUT_DIR"
+mkdir -p "$TMP_BUILD" "$OUT_DIR"
 
 pod install
 
@@ -24,10 +23,8 @@ xcodebuild build \
   -scheme "$SCHEME" \
   -configuration Debug \
   -sdk iphoneos \
-  BUILD_DIR="$BUILD_DIR" \
-  BUILD_ROOT="$BUILD_DIR"
-
-DEBUG_A="$BUILD_DIR/Debug-iphoneos/lib${PLUGIN_NAME}.a"
+  BUILD_DIR="$TMP_BUILD" \
+  BUILD_ROOT="$TMP_BUILD"
 
 #####################
 # BUILD RELEASE
@@ -37,30 +34,25 @@ xcodebuild build \
   -scheme "$SCHEME" \
   -configuration Release \
   -sdk iphoneos \
-  BUILD_DIR="$BUILD_DIR" \
-  BUILD_ROOT="$BUILD_DIR"
-
-RELEASE_A="$BUILD_DIR/Release-iphoneos/lib${PLUGIN_NAME}.a"
+  BUILD_DIR="$TMP_BUILD" \
+  BUILD_ROOT="$TMP_BUILD"
 
 #####################
 # CREATE XCFRAMEWORKS
 #####################
 xcodebuild -create-xcframework \
-  -library "$DEBUG_A" \
-  -output "$XC_OUT/${PLUGIN_NAME}.debug.xcframework"
+  -library "$TMP_BUILD/Debug-iphoneos/lib${PLUGIN_NAME}.a" \
+  -output "$OUT_DIR/${PLUGIN_NAME}.debug.xcframework"
 
 xcodebuild -create-xcframework \
-  -library "$RELEASE_A" \
-  -output "$XC_OUT/${PLUGIN_NAME}.release.xcframework"
+  -library "$TMP_BUILD/Release-iphoneos/lib${PLUGIN_NAME}.a" \
+  -output "$OUT_DIR/${PLUGIN_NAME}.release.xcframework"
 
 #####################
-# CREATE FINAL (FOR GODOT)
+# CLEAN TEMP BUILD
 #####################
-rm -rf "$XC_OUT/${PLUGIN_NAME}.xcframework"
-cp -R "$XC_OUT/${PLUGIN_NAME}.release.xcframework" \
-      "$XC_OUT/${PLUGIN_NAME}.xcframework"
+rm -rf "$TMP_BUILD"
 
-echo "✅ XCFrameworks generated:"
-echo " - ${PLUGIN_NAME}.debug.xcframework"
-echo " - ${PLUGIN_NAME}.release.xcframework"
-echo " - ${PLUGIN_NAME}.xcframework (used by .gdip)"
+echo "✅ Plugin SDK ready:"
+echo " - ${OUT_DIR}/${PLUGIN_NAME}.debug.xcframework"
+echo " - ${OUT_DIR}/${PLUGIN_NAME}.release.xcframework"
