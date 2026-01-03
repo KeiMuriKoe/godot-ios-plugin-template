@@ -3,7 +3,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-PLUGIN_NAME="usercentrics"
+PLUGIN_NAME="GodotPlugin"
 WORKSPACE="GodotPlugin.xcworkspace"
 SCHEME="GodotPlugin"
 
