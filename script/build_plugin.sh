@@ -59,7 +59,7 @@ xcodebuild build \
 RELEASE_LIB="$BUILD_DIR/Release-iphoneos/lib${PLUGIN_BINARY_NAME}.a"
 
 #####################
-# 3. CREATE XCFRAMEWORKS
+# CREATE XCFRAMEWORKS
 #####################
 echo "📦 Packaging XCFrameworks..."
 
