@@ -1,67 +1,80 @@
-##build_plugin.sh
+#build_plugin.sh
 #!/bin/bash
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-# === CONFIG (ШАБЛОН) ===
+# === CONFIG ===
 PLUGIN_NAME="GodotPlugin"
 WORKSPACE="${PLUGIN_NAME}.xcworkspace"
 SCHEME="${PLUGIN_NAME}"
 
 BUILD_DIR="$PWD/bin/build"
-XC_OUT="$PWD/bin/xcframework"
 
-rm -rf "$BUILD_DIR" "$XC_OUT"
-mkdir -p "$BUILD_DIR" "$XC_OUT"
+OUTPUT_DIR="$PWD/bin/${PLUGIN_NAME}"
 
-pod install
+rm -rf "$BUILD_DIR" "$OUTPUT_DIR"
+mkdir -p "$BUILD_DIR" "$OUTPUT_DIR"
+
+if [ -f "Podfile" ]; then
+    echo "📦 Installing Pods..."
+    pod install
+fi
 
 #####################
-# BUILD DEBUG
+# 1. BUILD DEBUG (DEVICE ONLY)
 #####################
+echo "🛠 Building Debug (iphoneos)..."
 xcodebuild build \
   -workspace "$WORKSPACE" \
   -scheme "$SCHEME" \
   -configuration Debug \
   -sdk iphoneos \
+  -destination 'generic/platform=iOS' \
   BUILD_DIR="$BUILD_DIR" \
-  BUILD_ROOT="$BUILD_DIR"
+  BUILD_ROOT="$BUILD_DIR" \
+  SYMROOT="$BUILD_DIR" \
+  > /dev/null
 
-DEBUG_A="$BUILD_DIR/Debug-iphoneos/lib${PLUGIN_NAME}.a"
+
+DEBUG_LIB="$BUILD_DIR/Debug-iphoneos/lib${PLUGIN_NAME}.a"
 
 #####################
-# BUILD RELEASE
+# 2. BUILD RELEASE (DEVICE ONLY)
 #####################
+echo "🚀 Building Release (iphoneos)..."
 xcodebuild build \
   -workspace "$WORKSPACE" \
   -scheme "$SCHEME" \
   -configuration Release \
   -sdk iphoneos \
+  -destination 'generic/platform=iOS' \
   BUILD_DIR="$BUILD_DIR" \
-  BUILD_ROOT="$BUILD_DIR"
+  BUILD_ROOT="$BUILD_DIR" \
+  SYMROOT="$BUILD_DIR" \
+  > /dev/null
 
-RELEASE_A="$BUILD_DIR/Release-iphoneos/lib${PLUGIN_NAME}.a"
+
+RELEASE_LIB="$BUILD_DIR/Release-iphoneos/lib${PLUGIN_NAME}.a"
 
 #####################
-# CREATE XCFRAMEWORKS
+# 3. CREATE XCFRAMEWORKS
 #####################
+echo "📦 Packaging XCFrameworks..."
+
+
 xcodebuild -create-xcframework \
-  -library "$DEBUG_A" \
-  -output "$XC_OUT/${PLUGIN_NAME}.debug.xcframework"
+  -library "$DEBUG_LIB" \
+  -output "$OUTPUT_DIR/${PLUGIN_NAME}.debug.xcframework"
+
 
 xcodebuild -create-xcframework \
-  -library "$RELEASE_A" \
-  -output "$XC_OUT/${PLUGIN_NAME}.release.xcframework"
+  -library "$RELEASE_LIB" \
+  -output "$OUTPUT_DIR/${PLUGIN_NAME}.release.xcframework"
 
-#####################
-# CREATE FINAL (FOR GODOT)
-#####################
-rm -rf "$XC_OUT/${PLUGIN_NAME}.xcframework"
-cp -R "$XC_OUT/${PLUGIN_NAME}.release.xcframework" \
-      "$XC_OUT/${PLUGIN_NAME}.xcframework"
 
-echo "✅ XCFrameworks generated:"
-echo " - ${PLUGIN_NAME}.debug.xcframework"
-echo " - ${PLUGIN_NAME}.release.xcframework"
-echo " - ${PLUGIN_NAME}.xcframework (used by .gdip)"
+rm -rf "$BUILD_DIR"
+
+echo "✅ Done!"
+echo "📂 Output structure in bin/${PLUGIN_NAME}:"
+ls -1 "$OUTPUT_DIR"
