@@ -72,7 +72,7 @@ display_status "Using \n*\t- '$NEW_PLUGIN_NAME' as plugin name, \n*\t- '$plugin_
 sed -i '' -e "s/$template_plugin_name_snake_case/$NEW_PLUGIN_NAME/g" script/build.sh
 
 # Change plugin name in build_plugin.sh
-sed -i '' -e "s/$template_plugin_name/$plugin_name_pascal_case/g" script/build_plugin.sh
+sed -i '' -e "s/$template_plugin_name/$plugin_name_snake_case/g" script/build_plugin.sh
 
 # Change value of `plugin_name` variable in the `script/install.sh` file to the plugin's new name.
 sed -i '' -e "s/$template_plugin_name/$plugin_name_pascal_case/g" script/install.sh
