@@ -5,16 +5,21 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 # === CONFIG ===
-PLUGIN_NAME="GodotPlugin"
-WORKSPACE="${PLUGIN_NAME}.xcworkspace"
-SCHEME="${PLUGIN_NAME}"
+PLUGIN_EXPORT_NAME="GodotPlugin"
+PLUGIN_BINARY_NAME="godot_plugin"
 
-BUILD_DIR="$PWD/bin/build"
+WORKSPACE="${PLUGIN_BINARY_NAME}.xcworkspace"
+SCHEME="${PLUGIN_BINARY_NAME}"
 
-OUTPUT_DIR="$PWD/bin/${PLUGIN_NAME}"
+BIN_DIR="$PWD/bin"
+BUILD_DIR="$BIN_DIR/build"
 
-rm -rf "$BUILD_DIR" "$OUTPUT_DIR"
-mkdir -p "$BUILD_DIR" "$OUTPUT_DIR"
+OUTPUT_ROOT="$BIN_DIR/${PLUGIN_EXPORT_NAME}"
+OUTPUT_LIBS="$OUTPUT_ROOT/${PLUGIN_BINARY_NAME}"
+
+echo "🧹 Cleaning bin directory..."
+rm -rf "$BIN_DIR"
+mkdir -p "$BUILD_DIR" "$OUTPUT_LIBS"
 
 if [ -f "Podfile" ]; then
     echo "📦 Installing Pods..."
@@ -22,7 +27,7 @@ if [ -f "Podfile" ]; then
 fi
 
 #####################
-# 1. BUILD DEBUG (DEVICE ONLY)
+# 1. BUILD DEBUG (с логами)
 #####################
 echo "🛠 Building Debug (iphoneos)..."
 xcodebuild build \
@@ -33,14 +38,12 @@ xcodebuild build \
   -destination 'generic/platform=iOS' \
   BUILD_DIR="$BUILD_DIR" \
   BUILD_ROOT="$BUILD_DIR" \
-  SYMROOT="$BUILD_DIR" \
-  > /dev/null
+  SYMROOT="$BUILD_DIR"
 
-
-DEBUG_LIB="$BUILD_DIR/Debug-iphoneos/lib${PLUGIN_NAME}.a"
+DEBUG_LIB="$BUILD_DIR/Debug-iphoneos/lib${PLUGIN_BINARY_NAME}.a"
 
 #####################
-# 2. BUILD RELEASE (DEVICE ONLY)
+# 2. BUILD RELEASE (с логами)
 #####################
 echo "🚀 Building Release (iphoneos)..."
 xcodebuild build \
@@ -51,30 +54,39 @@ xcodebuild build \
   -destination 'generic/platform=iOS' \
   BUILD_DIR="$BUILD_DIR" \
   BUILD_ROOT="$BUILD_DIR" \
-  SYMROOT="$BUILD_DIR" \
-  > /dev/null
+  SYMROOT="$BUILD_DIR"
 
-
-RELEASE_LIB="$BUILD_DIR/Release-iphoneos/lib${PLUGIN_NAME}.a"
+RELEASE_LIB="$BUILD_DIR/Release-iphoneos/lib${PLUGIN_BINARY_NAME}.a"
 
 #####################
 # 3. CREATE XCFRAMEWORKS
 #####################
 echo "📦 Packaging XCFrameworks..."
 
-
 xcodebuild -create-xcframework \
   -library "$DEBUG_LIB" \
-  -output "$OUTPUT_DIR/${PLUGIN_NAME}.debug.xcframework"
-
+  -output "$OUTPUT_LIBS/${PLUGIN_BINARY_NAME}.debug.xcframework"
 
 xcodebuild -create-xcframework \
   -library "$RELEASE_LIB" \
-  -output "$OUTPUT_DIR/${PLUGIN_NAME}.release.xcframework"
+  -output "$OUTPUT_LIBS/${PLUGIN_BINARY_NAME}.release.xcframework"
 
+#####################
+# 4. COPY GDIP
+#####################
+
+GDIP_SOURCE="config/${PLUGIN_BINARY_NAME}.gdip"
+GDIP_DEST="$OUTPUT_ROOT/${PLUGIN_BINARY_NAME}.gdip"
+
+if [ -f "$GDIP_SOURCE" ]; then
+    echo "📄 Copying .gdip file..."
+    cp "$GDIP_SOURCE" "$GDIP_DEST"
+else
+    echo "⚠️ Warning: .gdip file not found at $GDIP_SOURCE"
+fi
 
 rm -rf "$BUILD_DIR"
 
 echo "✅ Done!"
-echo "📂 Output structure in bin/${PLUGIN_NAME}:"
-ls -1 "$OUTPUT_DIR"
+echo "📂 Output structure:"
+ls -R "$OUTPUT_ROOT"

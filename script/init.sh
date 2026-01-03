@@ -4,39 +4,35 @@
 #
 set -e
 
-
 function display_help()
 {
-	echo
-	./script/echocolor.sh -y "The " -Y "$0 script" -y " initializes the repository with the name of plugin."
-	echo
-	./script/echocolor.sh -Y "Syntax:"
-	./script/echocolor.sh -y "	$0 [-h] <name of plugin>"
-	echo
-	./script/echocolor.sh -Y "Options:"
-	./script/echocolor.sh -y "	h	display usage information"
-	echo
-	./script/echocolor.sh -Y "Examples:"
-	./script/echocolor.sh -y "	   $> $0 'my_plugin'"
-	echo
+    echo
+    ./script/echocolor.sh -y "The " -Y "$0 script" -y " initializes the repository with the name of plugin."
+    echo
+    ./script/echocolor.sh -Y "Syntax:"
+    ./script/echocolor.sh -y "  $0 [-h] <name of plugin>"
+    echo
+    ./script/echocolor.sh -Y "Options:"
+    ./script/echocolor.sh -y "  h   display usage information"
+    echo
+    ./script/echocolor.sh -Y "Examples:"
+    ./script/echocolor.sh -y "     $> $0 'my_plugin'"
+    echo
 }
-
 
 function display_status()
 {
-	echo
-	./script/echocolor.sh -c "********************************************************************************"
-	./script/echocolor.sh -c "* $1"
-	./script/echocolor.sh -c "********************************************************************************"
-	echo
+    echo
+    ./script/echocolor.sh -c "********************************************************************************"
+    ./script/echocolor.sh -c "* $1"
+    ./script/echocolor.sh -c "********************************************************************************"
+    echo
 }
-
 
 function display_error()
 {
-	./script/echocolor.sh -r "$1"
+    ./script/echocolor.sh -r "$1"
 }
-
 
 if [ $# -eq 0 ]; then
   display_error "Error: Please provide the name of the plugin as an argument."
@@ -46,23 +42,23 @@ if [ $# -eq 0 ]; then
 fi
 
 while getopts "h" option; do
-	case $option in
-		h)
-			display_help
-			exit;;
-		\?)
-			display_error "Error: invalid option"
-			echo
-			display_help
-			exit;;
-	esac
+    case $option in
+        h)
+            display_help
+            exit;;
+        \?)
+            display_error "Error: invalid option"
+            echo
+            display_help
+            exit;;
+    esac
 done
 
 template_plugin_name="GodotPlugin"
 template_plugin_name_snake_case="godot_plugin"
 NEW_PLUGIN_NAME=$1
-NEW_PLUGIN_NAME="${NEW_PLUGIN_NAME// /_}"	# replace spaces with underscore
-NEW_PLUGIN_NAME="${NEW_PLUGIN_NAME//\-/_}"	# replace dashes with underscore
+NEW_PLUGIN_NAME="${NEW_PLUGIN_NAME// /_}"   # replace spaces with underscore
+NEW_PLUGIN_NAME="${NEW_PLUGIN_NAME//\-/_}"  # replace dashes with underscore
 plugin_name_pascal_case=`echo $NEW_PLUGIN_NAME | perl -pe 's/(^|[_])./uc($&)/ge;s/[_]//g'`
 plugin_name_snake_case=`echo $NEW_PLUGIN_NAME | perl -pe 's/([a-z0-9])([A-Z])/$1_\L$2/g' | perl -nE 'say lcfirst'`
 
@@ -71,8 +67,11 @@ display_status "Using \n*\t- '$NEW_PLUGIN_NAME' as plugin name, \n*\t- '$plugin_
 # Change value of `plugin_name` variable in the `script/build.sh` file to the plugin's new name.
 sed -i '' -e "s/$template_plugin_name_snake_case/$NEW_PLUGIN_NAME/g" script/build.sh
 
-# Change plugin name in build_plugin.sh
-sed -i '' -e "s/$template_plugin_name/$plugin_name_snake_case/g" script/build_plugin.sh
+
+sed -i '' -e "s/$template_plugin_name/$plugin_name_pascal_case/g" script/build_plugin.sh
+
+sed -i '' -e "s/$template_plugin_name_snake_case/$plugin_name_snake_case/g" script/build_plugin.sh
+# ==============================================
 
 # Change value of `plugin_name` variable in the `script/install.sh` file to the plugin's new name.
 sed -i '' -e "s/$template_plugin_name/$plugin_name_pascal_case/g" script/install.sh
@@ -83,8 +82,18 @@ sed -i '' -e "s/$template_plugin_name_snake_case/$NEW_PLUGIN_NAME/g" SConstruct
 # Change value of `plugin_name` variable in the `Podfile` file to the plugin's new name.
 sed -i '' -e "s/$template_plugin_name_snake_case/$NEW_PLUGIN_NAME/g" Podfile
 
-# Change name of library archive mentioned in the plugin's `.gdip` file to the plugin's new name.
-sed -i '' -e "s/$template_plugin_name_snake_case/$plugin_name_snake_case/g" config/$template_plugin_name_snake_case.gdip
+# === NEW: Update .gdip CONTENT before renaming ===
+GDIP_FILE="config/$template_plugin_name_snake_case.gdip"
+
+# 1. Update library name inside gdip (old logic)
+sed -i '' -e "s/$template_plugin_name_snake_case/$plugin_name_snake_case/g" "$GDIP_FILE"
+
+# 2. Replace __PLUGIN_NAME__ with PascalCase (Usercentrics)
+sed -i '' -e "s/__PLUGIN_NAME__/$plugin_name_pascal_case/g" "$GDIP_FILE"
+
+# 3. Replace __PLUGIN_BINARY__ with path structure (usercentrics/usercentrics.xcframework)
+sed -i '' -e "s|__PLUGIN_BINARY__|$plugin_name_snake_case/$plugin_name_snake_case.xcframework|g" "$GDIP_FILE"
+# =================================================
 
 # Change to the plugin's new name in source files.
 sed -i '' -e "s/$template_plugin_name_snake_case/$plugin_name_snake_case/g" $template_plugin_name_snake_case/*.h
