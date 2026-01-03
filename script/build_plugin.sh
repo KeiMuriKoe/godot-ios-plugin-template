@@ -27,7 +27,7 @@ if [ -f "Podfile" ]; then
 fi
 
 #####################
-# 1. BUILD DEBUG (с логами)
+# 1. BUILD DEBUG 
 #####################
 echo "🛠 Building Debug (iphoneos)..."
 xcodebuild build \
@@ -43,7 +43,7 @@ xcodebuild build \
 DEBUG_LIB="$BUILD_DIR/Debug-iphoneos/lib${PLUGIN_BINARY_NAME}.a"
 
 #####################
-# 2. BUILD RELEASE (с логами)
+# 2. BUILD RELEASE
 #####################
 echo "🚀 Building Release (iphoneos)..."
 xcodebuild build \
