@@ -7,16 +7,16 @@ cd ../
 mkdir -p bin
 pod install
 
-xcodebuild archive \
+xcodebuild build \
   -workspace GodotPlugin.xcworkspace \
   -scheme GodotPlugin \
-  -archivePath bin/ios_debug.xcarchive \
+  -configuration Debug \
   -sdk iphoneos \
-  -configuration Debug
+  BUILD_DIR="$PWD/bin"
 
-xcodebuild archive \
+xcodebuild build \
   -workspace GodotPlugin.xcworkspace \
   -scheme GodotPlugin \
-  -archivePath bin/ios_release.xcarchive \
+  -configuration Release \
   -sdk iphoneos \
-  -configuration Release
+  BUILD_DIR="$PWD/bin"
