@@ -3,28 +3,17 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-PLUGIN_NAME="GodotPlugin"
-WORKSPACE="${PLUGIN_NAME}.xcworkspace"
-SCHEME="${PLUGIN_NAME}"
+PLUGIN_NAME="usercentrics"
+WORKSPACE="GodotPlugin.xcworkspace"
+SCHEME="GodotPlugin"
 
-TMP_BUILD="$PWD/.build_tmp"
-OUT_DIR="$PWD/${PLUGIN_NAME}"
+BUILD_DIR="$PWD/bin/build"
+OUT_DIR="$PWD/bin/plugin"
 
-rm -rf "$TMP_BUILD" "$OUT_DIR"
-mkdir -p "$TMP_BUILD" "$OUT_DIR"
+rm -rf "$BUILD_DIR" "$OUT_DIR"
+mkdir -p "$BUILD_DIR" "$OUT_DIR"
 
 pod install
-
-#####################
-# BUILD DEBUG
-#####################
-xcodebuild build \
-  -workspace "$WORKSPACE" \
-  -scheme "$SCHEME" \
-  -configuration Debug \
-  -sdk iphoneos \
-  BUILD_DIR="$TMP_BUILD" \
-  BUILD_ROOT="$TMP_BUILD"
 
 #####################
 # BUILD RELEASE
@@ -34,25 +23,22 @@ xcodebuild build \
   -scheme "$SCHEME" \
   -configuration Release \
   -sdk iphoneos \
-  BUILD_DIR="$TMP_BUILD" \
-  BUILD_ROOT="$TMP_BUILD"
+  BUILD_DIR="$BUILD_DIR" \
+  BUILD_ROOT="$BUILD_DIR"
+
+RELEASE_A="$BUILD_DIR/Release-iphoneos/lib${PLUGIN_NAME}.a"
 
 #####################
-# CREATE XCFRAMEWORKS
+# CREATE XCFRAMEWORK
 #####################
 xcodebuild -create-xcframework \
-  -library "$TMP_BUILD/Debug-iphoneos/lib${PLUGIN_NAME}.a" \
-  -output "$OUT_DIR/${PLUGIN_NAME}.debug.xcframework"
-
-xcodebuild -create-xcframework \
-  -library "$TMP_BUILD/Release-iphoneos/lib${PLUGIN_NAME}.a" \
-  -output "$OUT_DIR/${PLUGIN_NAME}.release.xcframework"
+  -library "$RELEASE_A" \
+  -output "$OUT_DIR/${PLUGIN_NAME}.xcframework"
 
 #####################
-# CLEAN TEMP BUILD
+# CLEAN BUILD
 #####################
-rm -rf "$TMP_BUILD"
+rm -rf "$BUILD_DIR"
 
-echo "✅ Plugin SDK ready:"
-echo " - ${OUT_DIR}/${PLUGIN_NAME}.debug.xcframework"
-echo " - ${OUT_DIR}/${PLUGIN_NAME}.release.xcframework"
+echo "✅ Plugin ready:"
+echo " - ${OUT_DIR}/${PLUGIN_NAME}.xcframework"
