@@ -69,56 +69,72 @@ sed -i '' -e "s/$template_plugin_name_snake_case/$plugin_name_snake_case/g" scri
 
 sed -i '' -e "s/$template_plugin_name_snake_case/$NEW_PLUGIN_NAME/g" script/build.sh
 
-
-sed -i '' -e "s/$template_plugin_name/$plugin_name_pascal_case/g" script/build_plugin.sh
-
-sed -i '' -e "s/$template_plugin_name_snake_case/$plugin_name_snake_case/g" script/build_plugin.sh
-# ==============================================
-
-# Change value of `plugin_name` variable in the `script/install.sh` file to the plugin's new name.
 sed -i '' -e "s/$template_plugin_name/$plugin_name_pascal_case/g" script/install.sh
 sed -i '' -e "s/$template_plugin_name_snake_case/$NEW_PLUGIN_NAME/g" SConstruct
 sed -i '' -e "s/$template_plugin_name_snake_case/$NEW_PLUGIN_NAME/g" Podfile
 
-# === NEW: Update .gdip CONTENT before renaming ===
+# 2. Update GDIP config
 GDIP_FILE="config/$template_plugin_name_snake_case.gdip"
-
-# 1. Update library name inside gdip (old logic)
 sed -i '' -e "s/$template_plugin_name_snake_case/$plugin_name_snake_case/g" "$GDIP_FILE"
-
-# 2. Replace __PLUGIN_NAME__ with PascalCase (Usercentrics)
 sed -i '' -e "s/__PLUGIN_NAME__/$plugin_name_pascal_case/g" "$GDIP_FILE"
-
-# 3. Replace __PLUGIN_BINARY__ with path structure (usercentrics/usercentrics.xcframework)
 sed -i '' -e "s|__PLUGIN_BINARY__|$plugin_name_snake_case/$plugin_name_snake_case.xcframework|g" "$GDIP_FILE"
-# =================================================
 
+# 3. Update C++/Obj-C Source Files (.h, .mm)
 sed -i '' -e "s/$template_plugin_name_snake_case/$plugin_name_snake_case/g" $template_plugin_name_snake_case/*.h
 sed -i '' -e "s/$template_plugin_name_snake_case/$plugin_name_snake_case/g" $template_plugin_name_snake_case/*.mm
 sed -i '' -e "s/$template_plugin_name/$plugin_name_pascal_case/g" $template_plugin_name_snake_case/*.h
 sed -i '' -e "s/$template_plugin_name/$plugin_name_pascal_case/g" $template_plugin_name_snake_case/*.mm
 
+# =========================================================
+# START SWIFT SUPPORT
+# =========================================================
+
+sed -i '' -e "s/${template_plugin_name}Swift/${plugin_name_pascal_case}Swift/g" $template_plugin_name_snake_case/$template_plugin_name.swift
+
+sed -i '' -e "s/${template_plugin_name}Swift/${plugin_name_pascal_case}Swift/g" $template_plugin_name_snake_case/*.mm
+
+sed -i '' -e "s/${template_plugin_name_snake_case}-Swift.h/${plugin_name_snake_case}-Swift.h/g" $template_plugin_name_snake_case/*.mm
+
+sed -i '' -e "s/$template_plugin_name.swift/$plugin_name_pascal_case.swift/g" $template_plugin_name_snake_case.xcodeproj/project.pbxproj
+sed -i '' -e "s/${template_plugin_name_snake_case}-Bridging-Header.h/${plugin_name_snake_case}-Bridging-Header.h/g" $template_plugin_name_snake_case.xcodeproj/project.pbxproj
+
+# =========================================================
+# END SWIFT SUPPORT
+# =========================================================
+
+# 4. Update Xcode Project Contents (General)
 sed -i '' -e "s/$template_plugin_name_snake_case.xcodeproj/$NEW_PLUGIN_NAME.xcodeproj/g" \
-	$template_plugin_name_snake_case.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+    $template_plugin_name_snake_case.xcodeproj/project.xcworkspace/contents.xcworkspacedata
 
 sed -i '' -e "s/$template_plugin_name_snake_case.h/$plugin_name_snake_case.h/g" \
-	$template_plugin_name_snake_case.xcodeproj/project.pbxproj
+    $template_plugin_name_snake_case.xcodeproj/project.pbxproj
 sed -i '' -e "s/$template_plugin_name_snake_case.mm/$plugin_name_snake_case.mm/g" \
-	$template_plugin_name_snake_case.xcodeproj/project.pbxproj
+    $template_plugin_name_snake_case.xcodeproj/project.pbxproj
 sed -i '' -e "s/${template_plugin_name_snake_case}_implementation.h/${plugin_name_snake_case}_implementation.h/g" \
-	$template_plugin_name_snake_case.xcodeproj/project.pbxproj
+    $template_plugin_name_snake_case.xcodeproj/project.pbxproj
 sed -i '' -e "s/${template_plugin_name_snake_case}_implementation.mm/${plugin_name_snake_case}_implementation.mm/g" \
-	$template_plugin_name_snake_case.xcodeproj/project.pbxproj
+    $template_plugin_name_snake_case.xcodeproj/project.pbxproj
 sed -i '' -e "s/$template_plugin_name_snake_case.a/$plugin_name_snake_case.a/g" \
-	$template_plugin_name_snake_case.xcodeproj/project.pbxproj
+    $template_plugin_name_snake_case.xcodeproj/project.pbxproj
 sed -i '' -e "s/$template_plugin_name_snake_case/$NEW_PLUGIN_NAME/g" \
-	$template_plugin_name_snake_case.xcodeproj/project.pbxproj
+    $template_plugin_name_snake_case.xcodeproj/project.pbxproj
 
+# 5. RENAME DIRECTORIES AND FILES ON DISK
+
+# Rename main folder
 mv $template_plugin_name_snake_case $NEW_PLUGIN_NAME
+
+# Rename config
 mv config/$template_plugin_name_snake_case.gdip config/$plugin_name_snake_case.gdip
+
+# Rename xcode project
 mv $template_plugin_name_snake_case.xcodeproj $NEW_PLUGIN_NAME.xcodeproj
 
+# Rename Source Files (Obj-C/C++)
 mv $NEW_PLUGIN_NAME/$template_plugin_name_snake_case.h $NEW_PLUGIN_NAME/$plugin_name_snake_case.h
 mv $NEW_PLUGIN_NAME/$template_plugin_name_snake_case.mm $NEW_PLUGIN_NAME/$plugin_name_snake_case.mm
 mv $NEW_PLUGIN_NAME/${template_plugin_name_snake_case}_implementation.h $NEW_PLUGIN_NAME/${plugin_name_snake_case}_implementation.h
 mv $NEW_PLUGIN_NAME/${template_plugin_name_snake_case}_implementation.mm $NEW_PLUGIN_NAME/${plugin_name_snake_case}_implementation.mm
+
+mv $NEW_PLUGIN_NAME/$template_plugin_name.swift $NEW_PLUGIN_NAME/$plugin_name_pascal_case.swift
+mv $NEW_PLUGIN_NAME/${template_plugin_name_snake_case}-Bridging-Header.h $NEW_PLUGIN_NAME/${plugin_name_snake_case}-Bridging-Header.h
