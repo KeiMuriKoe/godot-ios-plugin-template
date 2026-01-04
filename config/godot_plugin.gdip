@@ -5,6 +5,8 @@ binary="__PLUGIN_BINARY__"
 initialization="godot_plugin_init"
 deinitialization="godot_plugin_deinit"
 
+use_swift_runtime=true
+
 [dependencies]
 linked=[]
 embedded=[]
