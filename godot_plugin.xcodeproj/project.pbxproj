@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		90CAAA9924E71FF10013969F /* godot_plugin.mm in Sources */ = {isa = PBXBuildFile; fileRef = 90CAAA9824E71FF10013969F /* godot_plugin.mm */; };
 		90CAAAA424E724C50013969F /* godot_plugin_implementation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 90CAAAA324E724C50013969F /* godot_plugin_implementation.mm */; };
-		B7909E272F0A48C70050FBE4 /* GodotSwiftModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7909E262F0A48AC0050FBE4 /* GodotSwiftModule.swift */; };
+		B7909E272F0A48C70050FBE4 /* GodotPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7909E262F0A48AC0050FBE4 /* GodotPlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,7 +30,7 @@
 		90CAAA9824E71FF10013969F /* godot_plugin.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = godot_plugin.mm; sourceTree = "<group>"; };
 		90CAAAA324E724C50013969F /* godot_plugin_implementation.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = godot_plugin_implementation.mm; sourceTree = "<group>"; };
 		90CAAAA524E724D00013969F /* godot_plugin_implementation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = godot_plugin_implementation.h; sourceTree = "<group>"; };
-		B7909E262F0A48AC0050FBE4 /* GodotSwiftModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GodotSwiftModule.swift; sourceTree = "<group>"; };
+		B7909E262F0A48AC0050FBE4 /* GodotPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GodotPlugin.swift; sourceTree = "<group>"; };
 		B7909E282F0A48CB0050FBE4 /* godot_plugin-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "godot_plugin-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -65,7 +65,7 @@
 		90CAAA9624E71FF10013969F /* godot_plugin */ = {
 			isa = PBXGroup;
 			children = (
-				B7909E262F0A48AC0050FBE4 /* GodotSwiftModule.swift */,
+				B7909E262F0A48AC0050FBE4 /* GodotPlugin.swift */,
 				90CAAA9724E71FF10013969F /* godot_plugin.h */,
 				90CAAA9824E71FF10013969F /* godot_plugin.mm */,
 				90CAAAA524E724D00013969F /* godot_plugin_implementation.h */,
@@ -142,7 +142,7 @@
 			files = (
 				90CAAAA424E724C50013969F /* godot_plugin_implementation.mm in Sources */,
 				90CAAA9924E71FF10013969F /* godot_plugin.mm in Sources */,
-				B7909E272F0A48C70050FBE4 /* GodotSwiftModule.swift in Sources */,
+				B7909E272F0A48C70050FBE4 /* GodotPlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

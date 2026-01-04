@@ -17,7 +17,7 @@ void GodotPlugin::_bind_methods() {
 
 Error GodotPlugin::foo() {
 	NSLog(@"GodotPlugin foo");
-    [GodotSwiftModule helloWorldFromSwift];
+    [GodotPluginSwift helloWorldFromSwift];
 	return OK;
 }
 
