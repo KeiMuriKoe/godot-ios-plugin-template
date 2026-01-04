@@ -15,7 +15,7 @@ class GodotPlugin : public Object {
 	
 public:
 	
-	Error foo();
+	Error hello_world();
 	
 	GodotPlugin();
 	~GodotPlugin();

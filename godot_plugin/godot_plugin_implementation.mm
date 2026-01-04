@@ -12,11 +12,11 @@
 
 
 void GodotPlugin::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("foo"), &GodotPlugin::foo);
+	ClassDB::bind_method(D_METHOD("hello_world"), &GodotPlugin::hello_world);
 }
 
-Error GodotPlugin::foo() {
-	NSLog(@"GodotPlugin foo");
+Error GodotPlugin::hello_world() {
+	NSLog(@"GodotPlugin - Hello world from Objective C++!");
     [GodotPluginSwift helloWorldFromSwift];
 	return OK;
 }
