@@ -15,7 +15,12 @@ class GodotPlugin : public Object {
 	
 public:
 	
-	Error hello_world();
+	void hello_world();
+    
+    void test_simple_signal();
+    void test_data_signal(const String &message);
+    void test_swift_void();
+    void test_swift_data();
 	
 	GodotPlugin();
 	~GodotPlugin();
