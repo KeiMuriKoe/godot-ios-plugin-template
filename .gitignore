@@ -37,3 +37,4 @@ godot/
 Pods/
 Podfile.lock
 godot_headers/
+godot_export/
